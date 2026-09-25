@@ -553,7 +553,7 @@ proc write_thresholds(fh: BGZI, tid: int, arr: var coverage_t, thresholds: seq[
     shallow(arr)
 
   # iterate over the region and count bases >= request cutoffs.
-  for v in arr[start..<stop]:
+  for v in arr.toOpenArray(start, stop - 1):
     for i, t in thresholds:
       # if we know they are sorted we can break
       if v < t: break
@@ -727,7 +727,7 @@ proc main(bam: hts.Bam, chrom: region_t, mapq: int, min_len: int, max_len: int, 
         if tid != -2:
           me = imean(arr, r.start, r.stop, cs)
           chrom_region_stat = chrom_region_stat +
-              newDepthStat(arr[ min(r.start, L)..<min(L, r.stop)])
+              newDepthStat(arr.toOpenArray(int(min(r.start, L)), int(min(L, r.stop)) - 1))
         var m = su.format_float(me, ffDecimal, precision = precision)
 
         if r.name == "":
@@ -750,7 +750,7 @@ proc main(bam: hts.Bam, chrom: region_t, mapq: int, min_len: int, max_len: int, 
 
     if tid != -2:
       chrom_global_distribution.inc(arr, uint32(0), uint32(len(arr) - 1))
-      chrom_stat = newDepthStat(arr[0..<len(arr)-1])
+      chrom_stat = newDepthStat(arr.toOpenArray(0, len(arr) - 2))
       global_stat = global_stat + chrom_stat
       write_summary(target.name, chrom_stat, fh_summary)
       if region != "":
