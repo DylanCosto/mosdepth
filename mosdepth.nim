@@ -41,6 +41,7 @@ type
     stop*: uint32
     name*: string
 
+  # Like region_t, but without chrom: string to save memory.
   interval_t = object
     start: uint32
     stop: uint32
